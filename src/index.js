@@ -1,6 +1,7 @@
+import 'babel-polyfill';
 import 'leaflet/dist/leaflet.css';
 import L, { marker } from 'leaflet';
-import {addTileLayer, validateIp} from './helpers';
+import {addTileLayer, getAddress, validateIp} from './helpers';
 import icon from '../images/icon-location.svg';
 
 const ipInput = document.querySelector('.search-bar__input');
@@ -30,9 +31,7 @@ L.marker([51.505, -0.09], {icon: markerIcon}).addTo(map);
 
 function getData() {
   if (validateIp(ipInput.value)) {
-    fetch(`
-    https://geo.ipify.org/api/v1?apiKey=at_uUXrCcPXIHM8aaAQf7Q6YtAiS2ivQ&ipAddress=${ipInput.value}`)
-      .then(response => response.json())
+    getAddress(ipInput.value)
       .then(setInfo);
   }
 }
@@ -44,8 +43,13 @@ function handleKey(e) {
 }
 
 function setInfo(mapData) {
+  const {lat, lng, country, region, timezone} = mapData.location;
+
   ipInfo.innerText = mapData.ip;
-  locationInfo.innerText = mapData.location.country + ' ' + mapData.location.region;
-  timezoneInfo.innerText = mapData.location.timezone;
+  locationInfo.innerText = country + ' ' + region;
+  timezoneInfo.innerText = timezone;
   ispInfo.innerText = mapData.isp;
+
+  map.setView([lat, lng]);
+  L.marker([lat, lng], {icon: markerIcon}).addTo(map);
 }
