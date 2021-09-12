@@ -18,3 +18,5 @@ build/
 dist/
 .cache/
 steps.md
+
+.vercel
