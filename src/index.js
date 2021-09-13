@@ -1,3 +1,4 @@
+require('dotenv').config();
 import 'babel-polyfill';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';

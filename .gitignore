@@ -18,5 +18,6 @@ build/
 dist/
 .cache/
 steps.md
-
+task.md
 .vercel
+.env
