@@ -58,6 +58,18 @@ function setInfo(mapData) {
   }
 }
 
+
+
 document.addEventListener('DOMContentLoaded', () => {
-  getAddress('102.22.22.1').then(setInfo);
+  navigator.geolocation.getCurrentPosition(function(position) {
+    console.log(position.coords.latitude, position.coords.longitude);
+
+    map.setView([position.coords.latitude, position.coords.longitude]);
+    L.marker([position.coords.latitude, position.coords.longitude], {icon: markerIcon}).addTo(map);
+
+  });
 });
+
+// document.addEventListener('DOMContentLoaded', () => {
+//   getAddress('102.22.22.1').then(setInfo);
+// });
