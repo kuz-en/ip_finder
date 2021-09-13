@@ -58,11 +58,31 @@ function setInfo(mapData) {
   }
 }
 
+function setInfoVPN(mapData) {
+  const {lat, lng, country, region, timezone} = mapData.location;
+
+  ipInfo.innerText = mapData.ip;
+  locationInfo.innerText = country + ' ' + region;
+  timezoneInfo.innerText = timezone;
+  ispInfo.innerText = mapData.isp;
+
+  if (matchMedia("(max-width: 1023px)").matches) {
+    addOffset(map);
+  }
+}
+
 function getIp() {
   fetch(`https://api64.ipify.org?format=json`)
       .then(response => response.json())
       .then(response => getAddress(response.ip))
       .then(setInfo);
+}
+
+function getIpVPN() {
+  fetch(`https://api64.ipify.org?format=json`)
+      .then(response => response.json())
+      .then(response => getAddress(response.ip))
+      .then(setInfoVPN);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -73,20 +93,20 @@ document.addEventListener('DOMContentLoaded', () => {
       maximumAge: 0
     };
 
-
     function errorCallback(error) {
       console.log('ERROR(' + error.code + '): ' + error.message);
       getIp();
     }
 
     function success(position) {
+      getIpVPN();
       const {latitude, longitude} = position.coords;
 
       map.setView([latitude, longitude]);
       L.marker([latitude, longitude], {icon: markerIcon}).addTo(map);
     }
 
-    getIp();
+
     navigator.geolocation.getCurrentPosition(success, errorCallback, options);
   } else {
     getIp();
