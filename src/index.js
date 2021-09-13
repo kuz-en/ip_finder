@@ -58,16 +58,41 @@ function setInfo(mapData) {
   }
 }
 
-
+function getIp() {
+  fetch(`https://api64.ipify.org?format=json`)
+      .then(response => response.json())
+      .then(response => getAddress(response.ip))
+      .then(setInfo);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-  navigator.geolocation.getCurrentPosition(function(position) {
-    console.log(position.coords.latitude, position.coords.longitude);
+  if ("geolocation" in navigator) {
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0
+    };
 
-    map.setView([position.coords.latitude, position.coords.longitude]);
-    L.marker([position.coords.latitude, position.coords.longitude], {icon: markerIcon}).addTo(map);
 
-  });
+    function errorCallback(error) {
+      console.log('ERROR(' + error.code + '): ' + error.message);
+      getIp();
+    }
+
+    function success(position) {
+      const {latitude, longitude} = position.coords;
+
+      map.setView([latitude, longitude]);
+      L.marker([latitude, longitude], {icon: markerIcon}).addTo(map);
+    }
+
+    getIp();
+    navigator.geolocation.getCurrentPosition(success, errorCallback, options);
+  } else {
+    getIp();
+  }
+
+
 });
 
 // document.addEventListener('DOMContentLoaded', () => {
