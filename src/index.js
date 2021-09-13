@@ -50,16 +50,15 @@ function setInfo(mapData) {
   timezoneInfo.innerText = timezone;
   ispInfo.innerText = mapData.isp;
 
-  map.setView([lat, lng]);
-  L.marker([lat, lng], {icon: markerIcon}).addTo(map);
+  setMap(lat, lng);
 
   if (matchMedia("(max-width: 1023px)").matches) {
     addOffset(map);
   }
 }
 
-function setInfoVPN(mapData) {
-  const {lat, lng, country, region, timezone} = mapData.location;
+function setInfoByPosition(mapData) {
+  const {country, region, timezone} = mapData.location;
 
   ipInfo.innerText = mapData.ip;
   locationInfo.innerText = country + ' ' + region;
@@ -71,18 +70,16 @@ function setInfoVPN(mapData) {
   }
 }
 
-function getIp() {
+function getIp(setInfo) {
   fetch(`https://api64.ipify.org?format=json`)
-      .then(response => response.json())
-      .then(response => getAddress(response.ip))
-      .then(setInfo);
+  .then(response => response.json())
+  .then(response => getAddress(response.ip))
+  .then(setInfo);
 }
 
-function getIpVPN() {
-  fetch(`https://api64.ipify.org?format=json`)
-      .then(response => response.json())
-      .then(response => getAddress(response.ip))
-      .then(setInfoVPN);
+function setMap(lat, lng) {
+  map.setView([lat, lng]);
+  L.marker([lat, lng], {icon: markerIcon}).addTo(map);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -95,26 +92,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function errorCallback(error) {
       console.log('ERROR(' + error.code + '): ' + error.message);
-      getIp();
+      getIp(setInfo);
     }
 
     function success(position) {
-      getIpVPN();
+      getIp(setInfoByPosition);
       const {latitude, longitude} = position.coords;
 
-      map.setView([latitude, longitude]);
-      L.marker([latitude, longitude], {icon: markerIcon}).addTo(map);
+      setMap(latitude, longitude);
     }
-
 
     navigator.geolocation.getCurrentPosition(success, errorCallback, options);
   } else {
-    getIp();
+    getIp(setInfo);
   }
-
-
 });
-
-// document.addEventListener('DOMContentLoaded', () => {
-//   getAddress('102.22.22.1').then(setInfo);
-// });
